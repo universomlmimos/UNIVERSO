@@ -1,0 +1,596 @@
+# ML Mimos — Portal Futurista Interativo
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Mimos | Entrada Futurista</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    :root{
+      --black:#05010d;
+      --purple:#7c1fff;
+      --lilac:#cf9fff;
+      --pink:#a83a8d;
+      --white:#ffffff;
+      --soft:#b774ff;
+    }
+
+    body{
+      overflow:hidden;
+      font-family:Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at center, #1a0733 0%, #090112 40%, #000000 100%);
+      width:100vw;
+      height:100vh;
+      position:relative;
+    }
+
+    .background{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      z-index:1;
+      background:
+      radial-gradient(circle at top left, rgba(194,119,255,.35), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(255,105,217,.25), transparent 30%),
+      radial-gradient(circle at center, rgba(124,31,255,.15), transparent 60%),
+      linear-gradient(135deg, #000000 0%, #140225 45%, #06010d 100%);
+    }
+
+    .grid{
+      position:absolute;
+      inset:0;
+      background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:40px 40px;
+      opacity:.4;
+      animation:gridMove 18s linear infinite;
+    }
+
+    @keyframes gridMove{
+      0%{transform:translateY(0px);}
+      100%{transform:translateY(40px);}
+    }
+
+    .line{
+      position:absolute;
+      background:linear-gradient(90deg, transparent, var(--lilac), transparent);
+      height:2px;
+      opacity:.8;
+      filter:drop-shadow(0 0 12px #c089f7);
+      animation:lineMove 7s linear infinite;
+    }
+
+    .line:nth-child(1){
+      width:50%;
+      top:12%;
+      left:-20%;
+    }
+
+    .line:nth-child(2){
+      width:40%;
+      top:32%;
+      right:-20%;
+      animation-delay:2s;
+    }
+
+    .line:nth-child(3){
+      width:60%;
+      bottom:18%;
+      left:-30%;
+      animation-delay:4s;
+    }
+
+    @keyframes lineMove{
+      0%{transform:translateX(0) scaleX(.7);opacity:0;}
+      50%{opacity:1;}
+      100%{transform:translateX(140vw) scaleX(1.2);opacity:0;}
+    }
+
+    .roses{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:2;
+    }
+
+    .rose{
+      position:absolute;
+      width:180px;
+      opacity:.12;
+      filter:drop-shadow(0 0 25px #9a38c0);
+      animation:floatRose 12s ease-in-out infinite;
+    }
+
+    .rose:nth-child(1){top:5%;left:-2%;}
+    .rose:nth-child(2){bottom:-5%;right:-2%;animation-delay:2s;}
+    .rose:nth-child(3){top:40%;right:8%;width:120px;animation-delay:4s;}
+    .rose:nth-child(4){bottom:25%;left:5%;width:130px;animation-delay:6s;}
+
+    @keyframes floatRose{
+      0%,100%{transform:translateY(0px) rotate(0deg) scale(1);}
+      50%{transform:translateY(-30px) rotate(5deg) scale(1.08);}
+    }
+
+    .diamonds{
+      position:absolute;
+      inset:0;
+      z-index:3;
+      pointer-events:none;
+      overflow:hidden;
+    }
+
+    .diamond{
+      position:absolute;
+      width:14px;
+      height:14px;
+      background:linear-gradient(135deg, #fff, #e7c3ff, #8d32ff);
+      transform:rotate(45deg);
+      opacity:.9;
+      border:1px solid rgba(255,255,255,.8);
+      box-shadow:
+      0 0 10px rgba(255,255,255,.9),
+      0 0 20px rgba(207,159,255,.8),
+      0 0 40px rgba(94, 42, 124, 0.6);
+      animation:fall linear infinite;
+    }
+
+    @keyframes fall{
+      0%{
+        transform:translateY(-10vh) rotate(0deg) scale(.7);
+        opacity:0;
+      }
+
+      10%{opacity:1;}
+
+      100%{
+        transform:translateY(120vh) rotate(360deg) scale(1.3);
+        opacity:0;
+      }
+    }
+
+    .main{
+      position:relative;
+      z-index:5;
+      width:100%;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      padding:20px;
+    }
+
+    .logo-container{
+      position:relative;
+      width:min(90vw, 430px);
+      height:min(90vw, 430px);
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all .4s ease;
+      animation:pulse 3s ease-in-out infinite;
+    }
+
+    .logo-container::before{
+      content:"";
+      position:absolute;
+      inset:-20px;
+      border-radius:50%;
+      background:conic-gradient(from 0deg, #792d66, #7c1fff, #cf9fff, #6c2672);
+      filter:blur(30px);
+      opacity:.8;
+      animation:spin 10s linear infinite;
+    }
+
+    .logo-container::after{
+      content:"";
+      position:absolute;
+      inset:-8px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.25);
+      box-shadow:
+      0 0 30px rgba(120, 64, 175, 0.7),
+      inset 0 0 20px rgba(161, 93, 93, 0.2);
+    }
+
+    @keyframes spin{
+      100%{transform:rotate(360deg);}
+    }
+
+    @keyframes pulse{
+      0%,100%{
+        transform:scale(1);
+      }
+      50%{
+        transform:scale(1.03);
+      }
+    }
+
+    .logo{
+      position:relative;
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      object-fit:cover;
+      z-index:2;
+      box-shadow:
+      0 0 50px rgba(162, 79, 245, 0.8),
+      0 0 90px rgba(90, 22, 110, 0.6);
+      animation:logoGlow 5s ease-in-out infinite;
+    }
+
+    @keyframes logoGlow{
+      0%,100%{
+        filter:brightness(1);
+      }
+      50%{
+        filter:brightness(1.15);
+      }
+    }
+
+    .title{
+      margin-top:25px;
+      color:white;
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:6px;
+      font-size:clamp(18px, 4vw, 32px);
+      text-shadow:
+      0 0 10px #cf9fff,
+      0 0 30px #7c1fff,
+      0 0 60px #512179;
+      animation:textPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes textPulse{
+      0%,100%{opacity:1;}
+      50%{opacity:.7;}
+    }
+
+    .subtitle{
+      margin-top:15px;
+      color:#e4c7ff;
+      text-align:center;
+      font-size:clamp(12px, 2vw, 18px);
+      max-width:800px;
+      line-height:1.7;
+      opacity:.9;
+      text-shadow:0 0 12px rgba(207,159,255,.7);
+    }
+
+    .btn-enter{
+      margin-top:35px;
+      padding:16px 45px;
+      border:none;
+      border-radius:50px;
+      font-size:17px;
+      font-weight:bold;
+      color:white;
+      background:linear-gradient(135deg, #7c1fff, #520366);
+      cursor:pointer;
+      letter-spacing:2px;
+      transition:.4s;
+      box-shadow:
+      0 0 25px rgba(98, 33, 128, 0.7),
+      0 0 50px rgba(156, 98, 238, 0.5);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .btn-enter::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-120%;
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+      transition:.7s;
+    }
+
+    .btn-enter:hover::before{
+      left:120%;
+    }
+
+    .btn-enter:hover{
+      transform:translateY(-5px) scale(1.04);
+      box-shadow:
+      0 0 35px rgba(120, 41, 145, 0.9),
+      0 0 80px rgba(159, 102, 238, 0.8);
+    }
+
+    .zoom{
+      animation:zoomPortal 2.2s forwards ease-in-out;
+    }
+
+    @keyframes zoomPortal{
+      0%{
+        transform:scale(1);
+        opacity:1;
+      }
+
+      50%{
+        transform:scale(1.5);
+        opacity:1;
+      }
+
+      100%{
+        transform:scale(8);
+        opacity:0;
+      }
+    }
+
+    .flash{
+      position:absolute;
+      inset:0;
+      background:white;
+      opacity:0;
+      z-index:999;
+      pointer-events:none;
+    }
+
+    .flash.active{
+      animation:flashEffect 1s forwards;
+    }
+
+    @keyframes flashEffect{
+      0%{opacity:0;}
+      50%{opacity:.9;}
+      100%{opacity:0;}
+    }
+
+    .particles{
+      position:absolute;
+      inset:0;
+      z-index:4;
+      overflow:hidden;
+      pointer-events:none;
+    }
+
+    .particle{
+      position:absolute;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:#470d68;
+      box-shadow:0 0 10px #9f50b3;
+      animation:particleMove linear infinite;
+      opacity:.8;
+    }
+
+    @keyframes particleMove{
+      0%{
+        transform:translateY(100vh) scale(0);
+        opacity:0;
+      }
+      20%{opacity:1;}
+      100%{
+        transform:translateY(-20vh) scale(1.4);
+        opacity:0;
+      }
+    }
+
+    @media(max-width:768px){
+
+      .title{
+        letter-spacing:3px;
+      }
+
+      .subtitle{
+        padding:0 12px;
+      }
+
+      .btn-enter{
+        width:90%;
+        max-width:320px;
+      }
+
+      .rose{
+        width:120px;
+      }
+    }
+
+    @media(max-width:480px){
+
+      .logo-container{
+        width:80vw;
+        height:80vw;
+      }
+
+      .title{
+        font-size:15px;
+      }
+
+      .subtitle{
+        font-size:13px;
+        line-height:1.5;
+      }
+
+      .btn-enter{
+        font-size:15px;
+        padding:14px 20px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<audio id="musica" loop>
+    <source src="./img/nastelbom-soft-corporate-488309.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+document.addEventListener("click", () => {
+    document.getElementById("musica").play();
+});
+</script>
+
+  <div class="background">
+    <div class="grid"></div>
+
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+  <div class="roses">
+
+    <svg class="rose" viewBox="0 0 200 200" fill="none">
+      <path d="M100 20C130 40 150 80 130 110C120 125 100 140 100 170C100 140 80 125 70 110C50 80 70 40 100 20Z" fill="#ff69d9"/>
+    </svg>
+
+    <svg class="rose" viewBox="0 0 200 200" fill="none">
+      <path d="M100 20C130 40 150 80 130 110C120 125 100 140 100 170C100 140 80 125 70 110C50 80 70 40 100 20Z" fill="#cf9fff"/>
+    </svg>
+
+    <svg class="rose" viewBox="0 0 200 200" fill="none">
+      <path d="M100 20C130 40 150 80 130 110C120 125 100 140 100 170C100 140 80 125 70 110C50 80 70 40 100 20Z" fill="#7c1fff"/>
+    </svg>
+
+    <svg class="rose" viewBox="0 0 200 200" fill="none">
+      <path d="M100 20C130 40 150 80 130 110C120 125 100 140 100 170C100 140 80 125 70 110C50 80 70 40 100 20Z" fill="#ff9ff1"/>
+    </svg>
+
+  </div>
+
+  <div class="diamonds" id="diamonds"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="main">
+
+    <div class="logo-container" id="portal">
+      <img src="./img/logo.jfif" class="logo" alt="ML Mimos" />
+    </div>
+
+    <h1 class="title">ML MIMOS <br> <br> Uma experiência visual futurista, luxuosa e totalmente interativa.</h1>
+
+    <p class="subtitle">
+      
+      
+    </p>
+
+    <button class="btn-enter" id="enterBtn">
+      ENTRAR NO SITE
+    </button>
+
+  </div>
+
+  <div class="flash" id="flash"></div>
+
+  <script>
+
+    const diamonds = document.getElementById('diamonds');
+
+    for(let i = 0; i < 65; i++){
+      const diamond = document.createElement('div');
+      diamond.classList.add('diamond');
+
+      diamond.style.left = Math.random() * 100 + 'vw';
+      diamond.style.animationDuration = (3 + Math.random() * 6) + 's';
+      diamond.style.animationDelay = Math.random() * 6 + 's';
+      diamond.style.opacity = Math.random();
+
+      const size = 6 + Math.random() * 18;
+      diamond.style.width = size + 'px';
+      diamond.style.height = size + 'px';
+
+      diamonds.appendChild(diamond);
+    }
+
+    const particles = document.getElementById('particles');
+
+    for(let i = 0; i < 90; i++){
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+
+      particle.style.left = Math.random() * 100 + 'vw';
+      particle.style.animationDuration = (5 + Math.random() * 10) + 's';
+      particle.style.animationDelay = Math.random() * 8 + 's';
+
+      const size = Math.random() * 4 + 1;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+
+      particles.appendChild(particle);
+    }
+
+    const portal = document.getElementById('portal');
+    const enterBtn = document.getElementById('enterBtn');
+    const flash = document.getElementById('flash');
+
+    function entrar(){
+
+      portal.classList.add('zoom');
+      flash.classList.add('active');
+
+      document.body.style.transition = 'all 1s ease';
+      document.body.style.filter = 'brightness(1.2)';
+
+      setTimeout(() => {
+        window.location.href = 'https://universomlmimos.github.io/ML_MIMOS/';
+      }, 2200);
+    }
+
+    portal.addEventListener('click', entrar);
+    enterBtn.addEventListener('click', entrar);
+
+  </script>
+  
+
+</body>
+</html>
+```
+
+---
+
+# COMO USAR
+
+1. Crie um arquivo chamado:
+
+```bash
+index.html
+```
+
+2. Cole TODO o código acima.
+
+3. Coloque sua logo na mesma pasta do HTML.
+
+4. Renomeie sua logo para:
+
+```bash
+SUA-LOGO.png
+```
+
+5. Abra o arquivo HTML no navegador.
+
+---
+
+# O QUE ESSE DESIGN POSSUI
+
+✔ Entrada futurista ultra premium
+✔ Fundo tecnológico animado
+✔ Linhas neon iguais à identidade da logo
+✔ Rosas brilhando no fundo
+✔ Diamantes realistas caindo
+✔ Partículas brilhantes
+✔ Glow neon profissional
+✔ Efeito cinematográfico de zoom
+✔ Logo aproximando da tela
+✔ Flash de transição premium
+✔ Responsivo para todos celulares
+✔ Compatível com Android e iPhone
+✔ Visual luxuoso e surreal
+✔ Site externo abre automaticamente
+✔ Tudo em apenas UM HTML
